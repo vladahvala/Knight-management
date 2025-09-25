@@ -1,0 +1,202 @@
+package model;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.Comparator;
+
+public class Knight {
+    private String name;
+    private int level;
+    private int coins;
+    private int health;
+    private double totalWeight;
+    private double totalPrice;
+    private boolean isEquipped;
+    private boolean isFullyEquipped;
+    private List<Armor> armors;
+    private List<Weapon> weapons;
+    private List<Accessory> accessories;
+
+    public Knight(String name, int level, int coins, int health, double totalWeight, 
+    double totalPrice, boolean isEquipped, boolean isFullyEquipped) {
+        this.name = name;
+        this.level = level;
+        this.coins = coins;
+        this.health = health;
+        this.totalWeight = totalWeight;
+        this.totalPrice = totalPrice;
+        this.isEquipped = isEquipped;
+        this.isFullyEquipped = isFullyEquipped;
+        this.armors = new ArrayList<>();
+        this.weapons = new ArrayList<>();
+        this.accessories = new ArrayList<>();
+    }
+
+    // Getters/Setters
+    public String getName() {
+        return name;
+    }
+ 
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public int getLevel() {
+        return level;
+    }
+ 
+    public void setLevel(int level) {
+        this.level = level;
+    }
+
+    public double getTotalWeight() {
+        return totalWeight;
+    }
+
+    public void setCoins(int coins) {
+        this.coins = coins;
+    }
+
+    public int getCoins() {
+        return coins;
+    }
+
+    public void setHealth(int health) {
+        this.health = health;
+    }
+
+    public int getHealth() {
+        return health;
+    }
+ 
+    public void setTotalWeight(double totalWeight) {
+        this.totalWeight = totalWeight;
+    }
+
+    public double getTotalPrice() {
+        return totalPrice;
+    }
+ 
+    public void setTotalPrice(double totalPrice) {
+        this.totalPrice = totalPrice;
+    }
+
+    public boolean getIsEquipped() {
+        return isEquipped;
+    }
+ 
+    public void setIsEquipped (boolean isEquipped) {
+        this.isEquipped = isEquipped;
+    }
+
+    public boolean getIsFullyEquipped() {
+        return isFullyEquipped;
+    }
+ 
+    public void setIsFullyEquipped (boolean isFullyEquipped) {
+        this.isFullyEquipped = isFullyEquipped;
+    }
+
+    public List<Armor> getArmors() {
+        return armors;
+    }
+
+    public List<Weapon> getWeapons() {
+        return weapons;
+    }
+
+    public List<Accessory> getAccessories() {
+        return accessories;
+    }
+
+
+    // Knight methods
+
+    public void equipArmor(Armor a){
+        armors.add(a);
+        equipmentCheck();
+    }
+
+    public void equipWeapon(Weapon w){
+        weapons.add(w);
+        equipmentCheck();
+    }
+
+    public void equipAccessory(Accessory ac){
+        accessories.add(ac);
+    }
+
+    // checks isEquipped/isFullyEquipped
+    public void equipmentCheck(){
+       if(!armors.isEmpty() || !weapons.isEmpty()) isEquipped=true;
+       if(hasAllArmorTypes() && !weapons.isEmpty()) isFullyEquipped=true;
+    }
+
+    public boolean hasAllArmorTypes() {
+        List<String> allTypes = Arrays.asList("Helmet", "Chestplate", "Boots", "Pants", "Gloves");
+        Set<String> typesInList = new HashSet<>();
+        for (Armor armor : armors) {
+            typesInList.add(armor.getType());
+        }
+        return typesInList.containsAll(allTypes);
+    }
+    
+    public double calculateTotalWeight(){
+        double weightSum = 0;
+        for (Armor armor : armors) {
+            weightSum += armor.getWeight();
+        }
+        for (Weapon weapon : weapons) {
+            weightSum += weapon.getWeight();
+        }
+        for (Accessory accessory : accessories) {
+            weightSum += accessory.getWeight();
+        }
+        totalWeight = weightSum;
+        return weightSum;
+    }
+
+    public double calculateTotalPrice(){
+        double priceSum = 0;
+        for (Armor armor : armors) {
+            priceSum += armor.getPrice();
+        }
+        for (Weapon weapon : weapons) {
+            priceSum += weapon.getPrice();
+        }
+        for (Accessory accessory : accessories) {
+            priceSum += accessory.getPrice();
+        }
+        totalPrice = priceSum;
+        return priceSum;
+    }
+
+    public void sortArmorsByWeight(){
+        armors.sort(Comparator.comparingDouble(Armor::getWeight));
+    }
+
+    // returns the list of affordable armor pieces
+    public List<String> affordableArmor() {
+        List<String> affordableArmor = new ArrayList<>(); 
+        for (Armor armor : armors) {
+            if (armor.getPrice() <= getCoins()) {
+                affordableArmor.add(armor.getName());
+            }
+        }
+        return affordableArmor;
+    }
+
+    // returns the list of armors, which belong in the price range
+    public List<String> findArmorsByPriceRange(double min, double max) {
+        List<String> inRange = new ArrayList<>(); 
+        for (Armor armor : armors) {
+            if (armor.getPrice() >= min && armor.getPrice() <= max) {
+                inRange.add(armor.getName());
+            }
+        }
+        return inRange;
+    }
+    
+}
