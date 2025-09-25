@@ -1,0 +1,3 @@
+Iron Helmet,Helmet,5,50,2
+Steel Chestplate,Chestplate,15,120,5
+Leather Boots,Boots,3,30,1
