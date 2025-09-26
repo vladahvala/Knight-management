@@ -28,7 +28,8 @@ public class FileHandler {
                 double weight = Double.parseDouble(parts[2]);
                 int price = Integer.parseInt(parts[3]);
                 int protectionLevel = Integer.parseInt(parts[4]);
-                armors.add(new Armor(name, type, weight, price, protectionLevel));
+                String material = parts[5];
+                armors.add(new Armor(name, type, weight, price, protectionLevel, material));
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -47,7 +48,8 @@ public class FileHandler {
                 double weight = Double.parseDouble(parts[2]);
                 int price = Integer.parseInt(parts[3]);
                 int damage = Integer.parseInt(parts[4]);
-                weapons.add(new Weapon(name, type, weight, price, damage));
+                String material = parts[5];
+                weapons.add(new Weapon(name, type, weight, price, damage, material));
             }
         } catch (IOException e) {
             e.printStackTrace();

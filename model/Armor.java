@@ -1,12 +1,14 @@
 package model;
 
-public class Armor extends KnightItem{
+public class Armor extends KnightItem implements MaterialItem{
 
     private int protectionLevel;
+    private String material;
 
-    public Armor(String name, String type, double weight, int price, int protectionLevel) {
+    public Armor(String name, String type, double weight, int price, int protectionLevel, String material) {
         super(name, type, weight, price);
         this.protectionLevel = protectionLevel;
+        this.material = material;
     }
 
     public void setProtectionLevel(int protectionLevel) {
@@ -15,6 +17,16 @@ public class Armor extends KnightItem{
 
     public int getProtectionLevel() {
         return protectionLevel;
+    }
+
+    @Override
+    public String getMaterial() {
+        return material;
+    }
+
+    @Override
+    public void setMaterial(String material) {
+        this.material = material;
     }
     
     @Override

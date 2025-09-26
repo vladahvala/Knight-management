@@ -1,12 +1,14 @@
 package model;
 
-public class Weapon extends KnightItem{
+public class Weapon extends KnightItem implements MaterialItem{
 
     private int damage;
+    private String material;
 
-    public Weapon(String name, String type, double weight, int price, int damage) {
+    public Weapon(String name, String type, double weight, int price, int damage, String material) {
         super(name, type, weight, price);
         this.damage = damage;
+        this.material = material;
     }
 
     public void setDamage(int damage) {
@@ -15,6 +17,16 @@ public class Weapon extends KnightItem{
 
     public int getDamage() {
         return damage;
+    }
+
+    @Override
+    public String getMaterial() {
+        return material;
+    }
+
+    @Override
+    public void setMaterial(String material) {
+        this.material = material;
     }
     
     @Override
