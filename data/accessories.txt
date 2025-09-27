@@ -1,0 +1,10 @@
+Magic Ring,Ring,0.1,200,Mana+5
+Health Amulet,Amulet,0.3,150,HP+10
+Silver Necklace,Necklace,0.2,80,Charisma+2
+Protection Talisman,Talisman,0.4,120,Shield+3
+Lucky Coin,Coin,0.05,20,Luck+1
+Stamina Bracelet,Bracelet,0.15,90,Stamina+4
+Invisibility Cloak,Cloak,1.2,500,Stealth+10
+Fire Charm,Charm,0.1,110,FireResist+5
+Ice Pendant,Pendant,0.2,130,ColdResist+6
+Swift Boots Charm,Charm,0.1,75,Speed+3

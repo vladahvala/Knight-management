@@ -10,15 +10,10 @@ import service.FileHandler;
 
 public class Main {
     public static void main(String[] args) {
-        // Menu menu = new Menu();
-        // menu.start(); // start menu
-        FileHandler fileHandler = new FileHandler("data/armors.txt");
-        List<Armor> armors = fileHandler.loadArmors();
-
-        System.out.println("Armors loaded:");
-        for (Armor armor : armors) {
-            System.out.println(armor);
-        }
-
+        Knight knight = new Knight("Sir Lancelot", 10, 100, 100, 4, 0, 0, false, false);
+        Armor gloves = new Armor("Reinforced Gloves", "Gloves", 2.8, 70, 3, "Iron");
+        knight.equipArmor(gloves);        
+        Menu menu = new Menu(knight);
+        menu.start(); // start menu
     }
 }

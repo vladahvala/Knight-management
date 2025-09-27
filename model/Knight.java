@@ -11,6 +11,7 @@ public class Knight {
     private int level;
     private int coins;
     private int health;
+    private int maxWeapons = 4;
     private double totalWeight;
     private double totalPrice;
     private boolean isEquipped;
@@ -19,12 +20,13 @@ public class Knight {
     private List<Weapon> weapons;
     private List<Accessory> accessories;
 
-    public Knight(String name, int level, int coins, int health, double totalWeight, 
+    public Knight(String name, int level, int coins, int health, int maxWeapons, double totalWeight, 
     double totalPrice, boolean isEquipped, boolean isFullyEquipped) {
         this.name = name;
         this.level = level;
         this.coins = coins;
         this.health = health;
+        this.maxWeapons = maxWeapons;
         this.totalWeight = totalWeight;
         this.totalPrice = totalPrice;
         this.isEquipped = isEquipped;
@@ -69,6 +71,14 @@ public class Knight {
 
     public int getHealth() {
         return health;
+    }
+
+    public void setMaxWeapons(int maxWeapons) {
+        this.maxWeapons = maxWeapons;
+    }
+
+    public int getMaxWeapons() {
+        return maxWeapons;
     }
  
     public void setTotalWeight(double totalWeight) {
@@ -142,6 +152,15 @@ public class Knight {
         }
         return typesInList.containsAll(allTypes);
     }
+
+    public boolean hasArmorType(String type) {
+        return armors.stream()
+                     .anyMatch(armor -> armor.getType().equalsIgnoreCase(type));
+    }
+
+    public int countWeapons() {
+        return weapons.size();
+    }    
     
     public double calculateTotalWeight(){
         double weightSum = 0;
@@ -175,6 +194,24 @@ public class Knight {
 
     public void sortArmorsByWeight(){
         armors.sort(Comparator.comparingDouble(Armor::getWeight));
+    }
+
+    public void sortWeaponsByWeight(){
+        weapons.sort(Comparator.comparingDouble(Weapon::getWeight));
+    }
+
+    public void sortAccessoriesByWeight(){
+        accessories.sort(Comparator.comparingDouble(Accessory::getWeight));
+    }
+
+    public void sortArmorsByHierarchy(){
+        List<String> allTypes = Arrays.asList("Helmet", "Chestplate", "Pants", "Boots", "Gloves");
+    
+        allTypes.forEach(type -> 
+            armors.stream()
+                  .filter(armor -> armor.getType().equalsIgnoreCase(type))
+                  .forEach(System.out::println)
+        );
     }
 
     // returns the list of affordable armor pieces
