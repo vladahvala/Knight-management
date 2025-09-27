@@ -36,6 +36,16 @@ public class ItemUtils {
                   .forEach(System.out::println)
         );
     }
+
+    public static void inventoryMaterialHierarchy(List<KnightItem> items) {
+        List<String> allTypes = Arrays.asList("Dragonhide", "Steel", "Iron", "Chainmail", "Bronze", "Leather");
+    
+        allTypes.forEach(type -> 
+            items.stream()
+                  .filter(item -> item.getType().equalsIgnoreCase(type))
+                  .forEach(System.out::println)
+        );
+    }
     
     // filtering any inventory item list by price range
     public static List<KnightItem> filterItemsByPrice(List<KnightItem> items, double min, double max) {

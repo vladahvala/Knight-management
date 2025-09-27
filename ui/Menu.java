@@ -28,7 +28,6 @@ public class Menu {
         this.knight = knight;
     }
 
-
     public void start() {
         Scanner scanner = new Scanner(System.in);
 
@@ -41,22 +40,38 @@ public class Menu {
                     showAllItemsMenu(scanner);
                     break;
                 case 2:
-                    startArmorHierarchyMenu(scanner);
+                    startArmorHierarchyTypeMenu(scanner);
                     break;
                 case 3:
-                    equipKnightMenu(scanner);
+                    itemHierarchyByMaterialMenu(scanner);
                     break;
                 case 4:
-                    disarmKnightMenu(scanner);
+                    equipKnightMenu(scanner);
                     break;
                 case 5:
-                    calculateCost();
+                    disarmKnightMenu(scanner);
                     break;
                 case 6:
-                    sortByWeightMenu(scanner);
+                    calcCostMenu(scanner);
                     break;
                 case 7:
+                    calcWeightMenu(scanner);
+                    break;
+                case 8:
+                    sortByWeightMenu(scanner);
+                    break;
+                case 9:
                     findByPriceRangeMenu(scanner);
+                    break;
+                case 10:
+                    if(knight.getIsFullyEquipped()) System.out.println("Is fully equipped");
+                    else{
+                        System.out.println("Is not fully equipped\n");
+                        knight.neededEquipment();
+                    }
+                    break;
+                case 11:
+                    affordableItemsMenu(scanner);
                     break;
                 case 0:
                     exit = true;
@@ -152,31 +167,48 @@ public class Menu {
     }
 
 
-    //----------------------Armor Hierarchy------------------------------------------------------------------
-    private void inventoryArmorHierarchy(List<Armor> armors) { 
+    //----------------------Armor Hierarchy by type------------------------------------------------------------------
+    private void startArmorHierarchyTypeMenu(Scanner scanner) {
+        FileHandler fileHandler = new FileHandler("data/armors.txt");
+        List<Armor> armors = fileHandler.loadArmors();
+        System.out.println("\n===============================Armor Hierarchy (INVENTORY)===============================");
         ItemUtils.inventoryArmorHierarchy(armors);
     }
 
-    private void knightArmorHierarchy() { 
-        knight.sortArmorsByHierarchy();
+
+    //----------------------Armor Hierarchy by material------------------------------------------------------------------
+    private <T extends KnightItem> void itemHierarchyByMaterialMenuGeneric(
+        Scanner scanner,
+        String filePath,
+        Function<FileHandler, List<T>> loader,
+        String itemName
+    ) {
+        FileHandler fileHandler = new FileHandler(filePath);
+        List<T> items = loader.apply(fileHandler);
+        List<KnightItem> itemList = new ArrayList<>(items);
+
+        System.out.println("\n=============================== " + itemName + " Hierarchy by Material ===============================");
+        ItemUtils.inventoryMaterialHierarchy(itemList);
+        itemList.forEach(System.out::println);
     }
 
-    private void startArmorHierarchyMenu(Scanner scanner) {
-        System.out.println("\n==== Armor Hierarchy Menu ====");
-        System.out.println("1. Inventory");
-        System.out.println("2. Knight");
+    private void itemHierarchyByMaterialMenu(Scanner scanner) {
+        System.out.println("\n==== Item Hierarchy by Material Menu ====");
+        System.out.println("1. Armor");
+        System.out.println("2. Weapon");
+        System.out.println("3. Accessory");
         System.out.print("Choose an option: ");
-    
+
         int subChoice = scanner.nextInt();
         switch (subChoice) {
             case 1:
-                FileHandler fileHandler = new FileHandler("data/armors.txt");
-                System.out.println("\n===============================Armor Hierarchy (INVENTORY)===============================");
-                inventoryArmorHierarchy(fileHandler.loadArmors());
+                itemHierarchyByMaterialMenuGeneric(scanner, "data/armors.txt", FileHandler::loadArmors, "Armor");
                 break;
             case 2:
-                System.out.println("\n===============================Armor Hierarchy (KNIGHT)===============================");
-                knightArmorHierarchy();
+                itemHierarchyByMaterialMenuGeneric(scanner, "data/weapons.txt", FileHandler::loadWeapons, "Weapon");
+                break;
+            case 3:
+                itemHierarchyByMaterialMenuGeneric(scanner, "data/accessories.txt", FileHandler::loadAccessories, "Accessory");
                 break;
             default:
                 System.out.println("Wrong choice. Returning to main menu...");
@@ -385,14 +417,63 @@ public class Menu {
     }
 
 
-    //----------------------Calculate Knight`s armor cost------------------------------------------------------------------
-    private int calculateCost() {
-        int cost = 0;
-        List<Armor> armors = knight.getArmors();
-        for(Armor armor : armors){
-            cost+=armor.getPrice();
+    //----------------------Calculate Knight`s items cost------------------------------------------------------------------
+    private void calcCostMenu(Scanner scanner) {
+        System.out.println("\n==== Calculate the cost Menu ====");
+        System.out.println("1. Armor");
+        System.out.println("2. Weapon");
+        System.out.println("3. Accessory");
+        System.out.print("Choose an option: ");
+
+        int subChoice = scanner.nextInt();
+        double total = 0.0;
+
+        switch (subChoice) {
+            case 1:
+                total = knight.calculateSum(knight.getArmors(), Armor::getPrice);
+                System.out.println("Total cost of knight's armors: " + total);
+                break;
+            case 2:
+                total = knight.calculateSum(knight.getWeapons(), Weapon::getPrice);
+                System.out.println("Total cost of knight's weapons: " + total);
+                break;
+            case 3:
+                total = knight.calculateSum(knight.getAccessories(), Accessory::getPrice);
+                System.out.println("Total cost of knight's accessories: " + total);
+                break;
+            default:
+                System.out.println("Wrong choice. Returning to main menu...");
         }
-        return cost;
+    }
+
+
+    //----------------------Calculate Knight`s items weight------------------------------------------------------------------
+    private void calcWeightMenu(Scanner scanner) {
+        System.out.println("\n==== Calculate the weight Menu ====");
+        System.out.println("1. Armor");
+        System.out.println("2. Weapon");
+        System.out.println("3. Accessory");
+        System.out.print("Choose an option: ");
+
+        int subChoice = scanner.nextInt();
+        double total = 0.0;
+
+        switch (subChoice) {
+            case 1:
+                total = knight.calculateSum(knight.getArmors(), Armor::getWeight);
+                System.out.println("Total cost of knight's armors: " + total);
+                break;
+            case 2:
+                total = knight.calculateSum(knight.getWeapons(), Weapon::getWeight);
+                System.out.println("Total cost of knight's weapons: " + total);
+                break;
+            case 3:
+                total = knight.calculateSum(knight.getAccessories(), Accessory::getWeight);
+                System.out.println("Total cost of knight's accessories: " + total);
+                break;
+            default:
+                System.out.println("Wrong choice. Returning to main menu...");
+        }
     }
 
 
@@ -452,7 +533,7 @@ public class Menu {
         }
     }
 
-    
+
     //----------------------Find items by price range------------------------------------------------------------------
     private void findByPriceRangeMenu(Scanner scanner) {
         System.out.println("\n==== Find by price range Menu ====");
@@ -515,15 +596,48 @@ public class Menu {
         }
     }
 
+
+    //----------------------Showing affordable items------------------------------------------------------------------
+    private void affordableItemsMenu(Scanner scanner) {
+        System.out.println("\n==== Show all the affordable items Menu ====");
+        System.out.println("1. Armor");
+        System.out.println("2. Weapon");
+        System.out.println("3. Accessory");
+        System.out.print("Choose an option: ");
+    
+        int subChoice = scanner.nextInt();
+        switch (subChoice) {
+            case 1:
+                List<String> affordableArmors = knight.affordableItems(knight.getArmors(), Armor::getPrice);
+                System.out.println("The affordable armors: " + affordableArmors);
+                break;
+            case 2:
+                List<String> affordableWeapons = knight.affordableItems(knight.getWeapons(), Weapon::getPrice);
+                System.out.println("The affordable weapons: " + affordableWeapons);
+                break;
+            case 3:
+                List<String> affordableAccessories = knight.affordableItems(knight.getAccessories(), Accessory::getPrice);
+                System.out.println("The affordable accessories: " + affordableAccessories);
+                break;
+            default:
+                System.out.println("Wrong choice. Returning to main menu...");
+        }
+    }
+
     private void printMenu() {
         System.out.println("\n=========== Knight menu ============");
         System.out.println("1. Show all items");
-        System.out.println("2. Define the hierarchy of the armor");
-        System.out.println("3. Equip the knight");
-        System.out.println("4. Disarm the knight");
-        System.out.println("5. Calculate the cost of the Knight`s armor");
-        System.out.println("6. Sort the items by weight");
-        System.out.println("7. Find armor pieces by price range");
+        System.out.println("2. Define the hierarchy of the armor by type");
+        System.out.println("3. Define the hierarchy of the items by material");
+        System.out.println("4. Equip the knight");
+        System.out.println("5. Disarm the knight");
+        System.out.println("6. Calculate the cost of the Knight`s items");
+        System.out.println("7. Calculate the weight of the Knight`s items");
+        System.out.println("8. Sort the items by weight");
+        System.out.println("9. Find items by price range");
+        System.out.println("10. Check if the Knight is fully equipped");
+        System.out.println("11. Show all the affordable items");
+        System.out.println("\n=========== Exit ============");
         System.out.println("0. Exit");
         System.out.print("Choose an action: ");
     }

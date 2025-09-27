@@ -1,9 +1,8 @@
 Leather Boots,Boots,2.5,30,1,Leather
 Bronze Gauntlets,Gloves,3.0,45,2,Bronze
 Chainmail Pants,Pants,8.0,90,4,Chainmail
-Mithril Helm,Helmet,3.5,800,12,Mithril
+Gold Helm,Helmet,3.5,800,12,Gold
 Plate Greaves,Boots,6.0,120,5,Steel
 Reinforced Gloves,Gloves,2.8,70,3,Iron
-Studded Leather Chestplate,Chestplate,7.0,65,3,Leather
 Dragonhide Leggings,Pants,5.5,400,9,Dragonhide
 Steel Chestplate,Chestplate,15.0,150,6,Steel

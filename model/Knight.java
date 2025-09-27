@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.Comparator;
 
 public class Knight {
@@ -124,6 +125,7 @@ public class Knight {
 
     // Knight methods
 
+    // Equip
     public void equipArmor(Armor a){
         armors.add(a);
         equipmentCheck();
@@ -144,6 +146,14 @@ public class Knight {
        if(hasAllArmorTypes() && !weapons.isEmpty()) isFullyEquipped=true;
     }
 
+    public void neededEquipment(){
+        System.out.println("Needed equipment: \n");
+        for (String type : missingArmorTypes()) {
+            System.out.println(type + "\n");
+        }
+        if(weapons.isEmpty()) System.out.println("weapon");
+    }
+
     public boolean hasAllArmorTypes() {
         List<String> allTypes = Arrays.asList("Helmet", "Chestplate", "Boots", "Pants", "Gloves");
         Set<String> typesInList = new HashSet<>();
@@ -153,45 +163,42 @@ public class Knight {
         return typesInList.containsAll(allTypes);
     }
 
+    public List<String> missingArmorTypes() {
+        List<String> allTypes = Arrays.asList("Helmet", "Chestplate", "Boots", "Pants", "Gloves");
+        Set<String> typesInList = new HashSet<>();
+    
+        for (Armor armor : armors) {
+            typesInList.add(armor.getType());
+        }
+    
+        List<String> missing = new ArrayList<>();
+        for (String type : allTypes) {
+            if (!typesInList.contains(type)) {
+                missing.add(type);
+            }
+        }
+        return missing;
+    }
+    
     public boolean hasArmorType(String type) {
         return armors.stream()
                      .anyMatch(armor -> armor.getType().equalsIgnoreCase(type));
     }
 
+    // Couning weapons
     public int countWeapons() {
         return weapons.size();
     }    
     
-    public double calculateTotalWeight(){
-        double weightSum = 0;
-        for (Armor armor : armors) {
-            weightSum += armor.getWeight();
-        }
-        for (Weapon weapon : weapons) {
-            weightSum += weapon.getWeight();
-        }
-        for (Accessory accessory : accessories) {
-            weightSum += accessory.getWeight();
-        }
-        totalWeight = weightSum;
-        return weightSum;
+
+    // calculating sum of items    
+    public <T extends KnightItem> double calculateSum(List<T> items, Function<T, Double> getter) {
+        return items.stream()
+                    .map(getter)
+                    .reduce(0.0, Double::sum);
     }
 
-    public double calculateTotalPrice(){
-        double priceSum = 0;
-        for (Armor armor : armors) {
-            priceSum += armor.getPrice();
-        }
-        for (Weapon weapon : weapons) {
-            priceSum += weapon.getPrice();
-        }
-        for (Accessory accessory : accessories) {
-            priceSum += accessory.getPrice();
-        }
-        totalPrice = priceSum;
-        return priceSum;
-    }
-
+    // sorting items
     public void sortArmorsByWeight(){
         armors.sort(Comparator.comparingDouble(Armor::getWeight));
     }
@@ -204,36 +211,15 @@ public class Knight {
         accessories.sort(Comparator.comparingDouble(Accessory::getWeight));
     }
 
-    public void sortArmorsByHierarchy(){
-        List<String> allTypes = Arrays.asList("Helmet", "Chestplate", "Pants", "Boots", "Gloves");
-    
-        allTypes.forEach(type -> 
-            armors.stream()
-                  .filter(armor -> armor.getType().equalsIgnoreCase(type))
-                  .forEach(System.out::println)
-        );
-    }
-
-    // returns the list of affordable armor pieces
-    public List<String> affordableArmor() {
-        List<String> affordableArmor = new ArrayList<>(); 
-        for (Armor armor : armors) {
-            if (armor.getPrice() <= getCoins()) {
-                affordableArmor.add(armor.getName());
+    // returns the list of affordable items
+    public <T extends KnightItem> List<String> affordableItems(List<T> items, Function<T, Double> priceGetter) {
+        List<String> affordable = new ArrayList<>();
+        for (T item : items) {
+            if (priceGetter.apply(item) <= getCoins()) {
+                affordable.add(item.getName());
             }
         }
-        return affordableArmor;
-    }
-
-    // returns the list of armors, which belong in the price range
-    public List<String> findArmorsByPriceRange(double min, double max) {
-        List<String> inRange = new ArrayList<>(); 
-        for (Armor armor : armors) {
-            if (armor.getPrice() >= min && armor.getPrice() <= max) {
-                inRange.add(armor.getName());
-            }
-        }
-        return inRange;
-    }
+        return affordable;
+    }    
     
 }
