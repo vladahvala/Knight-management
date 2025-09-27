@@ -36,7 +36,8 @@ public class Weapon extends KnightItem implements MaterialItem{
 
     @Override
     public String toString() {
-        return super.toString() + ", Damage: " + damage; 
+        return String.format("%-20s %-14s %-6.1f %-6d %-6d %-10s",
+                getName(), getType(), getWeight(), (int)getPrice(), getDamage(), getMaterial());
     }
 
 }

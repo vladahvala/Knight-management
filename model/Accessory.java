@@ -24,7 +24,8 @@ public class Accessory extends KnightItem{
 
     @Override
     public String toString() {
-        return super.toString() + ", Effect: " + effect;
+        return String.format("%-25s %-14s %-6.1f %-6d %-6s",
+                getName(), getType(), getWeight(), (int)getPrice(), getEffect());
     }
 
 }

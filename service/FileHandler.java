@@ -23,6 +23,9 @@ public class FileHandler {
             String line;
             while ((line = reader.readLine()) != null) {
                 String[] parts = line.split(",");
+                if (parts.length < 6) {
+                    continue; 
+                }
                 String name = parts[0];
                 String type = parts[1];
                 double weight = Double.parseDouble(parts[2]);
@@ -31,6 +34,7 @@ public class FileHandler {
                 String material = parts[5];
                 armors.add(new Armor(name, type, weight, price, protectionLevel, material));
             }
+            
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -43,6 +47,9 @@ public class FileHandler {
             String line;
             while ((line = reader.readLine()) != null) {
                 String[] parts = line.split(",");
+                if (parts.length < 6) {
+                    continue; 
+                }
                 String name = parts[0];
                 String type = parts[1];
                 double weight = Double.parseDouble(parts[2]);
@@ -63,6 +70,9 @@ public class FileHandler {
             String line;
             while ((line = reader.readLine()) != null) {
                 String[] parts = line.split(",");
+                if (parts.length < 5) {
+                    continue; 
+                }
                 String name = parts[0];
                 String type = parts[1];
                 double weight = Double.parseDouble(parts[2]);

@@ -6,6 +6,11 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Supplier;
+import java.util.function.Predicate;
 
 import model.Accessory;
 import model.Armor;
@@ -17,7 +22,7 @@ import service.FileHandler;
 
 public class Menu {
     private boolean exit = false;
-    private Knight knight; // оголоси поле в класі Menu
+    private Knight knight; 
 
     public Menu(Knight knight) {
         this.knight = knight;
@@ -33,37 +38,25 @@ public class Menu {
 
             switch (choice) {
                 case 1:
-                    showAllArmors(scanner);
+                    showAllItemsMenu(scanner);
                     break;
                 case 2:
-                    showAllWeapons(scanner);
-                    break;
-                case 3:
-                    showAllAccessories(scanner);
-                    break;
-                case 4:
                     startArmorHierarchyMenu(scanner);
                     break;
-                case 5:
+                case 3:
                     equipKnightMenu(scanner);
                     break;
-                case 6:
+                case 4:
                     disarmKnightMenu(scanner);
                     break;
-                case 7:
+                case 5:
                     calculateCost();
                     break;
-                case 8:
-                    sortArmorByWeight(scanner);
+                case 6:
+                    sortByWeightMenu(scanner);
                     break;
-                case 9:
-                    sortWeaponsByWeight(scanner);
-                    break;
-                case 10:
-                    sortAccessoriesByWeight(scanner);
-                    break;
-                case 11:
-                    findByPriceRange();
+                case 7:
+                    findByPriceRangeMenu(scanner);
                     break;
                 case 0:
                     exit = true;
@@ -81,50 +74,61 @@ public class Menu {
     }
 
     //----------------------Show All Items------------------------------------------------------------------
+    private void showAllItemsMenu(Scanner scanner) {
+        System.out.println("\n==== Show all items Menu ====");
+        System.out.println("1. Armor");
+        System.out.println("2. Weapon");
+        System.out.println("3. Accessory");
+        System.out.print("Choose an option: ");
+    
+        int subChoice = scanner.nextInt();
+        switch (subChoice) {
+            case 1:
+                showAllArmors(scanner);
+                break;
+            case 2:
+                showAllWeapons(scanner);
+                break;
+            case 3:
+                showAllAccessories(scanner);
+                break;
+            default:
+                System.out.println("Wrong choice. Returning to main menu...");
+        }
+    }
+
     private void showAllArmors(Scanner scanner) {
-        System.out.println("\n==== Armors Menu ====");
-        System.out.println("1. Inventory");
-        System.out.println("2. Knight");
-        System.out.print("Choose an option: ");
-
-        int subChoice = scanner.nextInt();
-        switch (subChoice) {
-            case 1:
-                FileHandler fileHandler = new FileHandler("data/armors.txt");
-                List<Armor> armors = fileHandler.loadArmors();
-                armors.forEach(System.out::println);
-                break;
-            case 2:
-                knight.getArmors();
-                break;
-            default:
-                System.out.println("Wrong choice. Returning to main menu...");
-        }
+        showAllItems(scanner,
+                "data/armors.txt",
+                FileHandler::loadArmors,
+                knight::getArmors,
+                "Armors");
     }
-
+    
     private void showAllWeapons(Scanner scanner) {
-        System.out.println("\n==== Weapons Menu ====");
-        System.out.println("1. Inventory");
-        System.out.println("2. Knight");
-        System.out.print("Choose an option: ");
-
-        int subChoice = scanner.nextInt();
-        switch (subChoice) {
-            case 1:
-                FileHandler fileHandler = new FileHandler("data/weapons.txt");
-                List<Weapon> weapons = fileHandler.loadWeapons();
-                weapons.forEach(System.out::println);
-                break;
-            case 2:
-                knight.getWeapons();
-                break;
-            default:
-                System.out.println("Wrong choice. Returning to main menu...");
-        }
+        showAllItems(scanner,
+                "data/weapons.txt",
+                FileHandler::loadWeapons,
+                knight::getWeapons,
+                "Weapons");
     }
-
+    
     private void showAllAccessories(Scanner scanner) {
-        System.out.println("\n==== Accessories Menu ====");
+        showAllItems(scanner,
+                "data/accessories.txt",
+                FileHandler::loadAccessories,
+                knight::getAccessories,
+                "Accessories");
+    }
+
+    private <T> void showAllItems(
+        Scanner scanner,
+        String filePath,
+        Function<FileHandler, List<T>> loader,
+        Supplier<List<T>> knightGetter,
+        String itemName
+    ) {
+        System.out.println("\n==== " + itemName + " Menu ====");
         System.out.println("1. Inventory");
         System.out.println("2. Knight");
         System.out.print("Choose an option: ");
@@ -132,17 +136,21 @@ public class Menu {
         int subChoice = scanner.nextInt();
         switch (subChoice) {
             case 1:
-                FileHandler fileHandler = new FileHandler("data/accessories.txt");
-                List<Accessory> accessories = fileHandler.loadAccessories();
-                accessories.forEach(System.out::println);
+                FileHandler fileHandler = new FileHandler(filePath);
+                List<T> items = loader.apply(fileHandler);
+                System.out.println("\n===============================" + itemName + " Inventory ===============================");
+                items.forEach(System.out::println);
                 break;
             case 2:
-                knight.getAccessories();
+                List<T> knightItems = knightGetter.get();
+                System.out.println("\n===============================" + itemName + " Knight ===============================");
+                knightItems.forEach(System.out::println);
                 break;
             default:
                 System.out.println("Wrong choice. Returning to main menu...");
         }
     }
+
 
     //----------------------Armor Hierarchy------------------------------------------------------------------
     private void inventoryArmorHierarchy(List<Armor> armors) { 
@@ -187,130 +195,103 @@ public class Menu {
         int subChoice = scanner.nextInt();
         switch (subChoice) {
             case 1:
-                equipKnightWithArmor(scanner);
+                equipItem(scanner,
+                        "data/armors.txt",
+                        FileHandler::loadArmors,
+                        knight::equipArmor,
+                        (writer, armor) -> {
+                            Armor a = (Armor) armor;
+                            writer.println(a.getName() + "," + a.getType() + "," + a.getWeight() + "," +
+                                    (int) a.getPrice() + "," + a.getProtectionLevel() + "," + a.getMaterial());
+                        },
+                        item -> {
+                            Armor a = (Armor) item;
+                            return !knight.hasArmorType(a.getType());
+                        });
                 break;
+    
             case 2:
-                equipKnightWithWeapon(scanner);
+                equipItem(scanner,
+                        "data/weapons.txt",
+                        FileHandler::loadWeapons,
+                        knight::equipWeapon,
+                        (writer, weapon) -> {
+                            Weapon w = (Weapon) weapon;
+                            writer.println(w.getName() + "," + w.getType() + "," + w.getWeight() + "," +
+                                    (int) w.getPrice() + "," + w.getDamage() + "," + w.getMaterial());
+                        },
+                        item -> knight.countWeapons() < knight.getMaxWeapons());
                 break;
+    
             case 3:
-                equipKnightWithAccessory(scanner);
+                equipItem(scanner,
+                        "data/accessories.txt",
+                        FileHandler::loadAccessories,
+                        knight::equipAccessory,
+                        (writer, accessory) -> {
+                            Accessory ac = (Accessory) accessory;
+                            writer.println(ac.getName() + "," + ac.getType() + "," + ac.getWeight() + "," +
+                                    (int) ac.getPrice() + "," + ac.getEffect());
+                        },
+                        item -> true);
                 break;
+    
             default:
                 System.out.println("Wrong choice. Returning to main menu...");
         }
     }
+    
+    private <T> void equipItem(
+        Scanner scanner,
+        String filePath,
+        Function<FileHandler, List<T>> loader,
+        Consumer<T> equipAction,
+        BiConsumer<PrintWriter, T> writerAction,
+        Predicate<T> condition
+    ) {
+        FileHandler fileHandler = new FileHandler(filePath);
+        List<T> items = loader.apply(fileHandler);
 
-    private void equipKnightWithArmor(Scanner scanner) {
-        FileHandler fileHandler = new FileHandler("data/armors.txt");
-        List<Armor> armors = fileHandler.loadArmors();
+        System.out.println("\n================ Available Items ================");
+        items.forEach(System.out::println);
 
-        System.out.println("\n================ Available Armors ================");
-        armors.forEach(System.out::println);
+        System.out.print("Enter the name of the item you want to equip: ");
+        scanner.nextLine();
+        String name = scanner.nextLine();
 
-        System.out.print("Enter the name of the armor you want to equip: ");
-        scanner.nextLine(); 
-        String armorName = scanner.nextLine();
-
-        Armor chosenArmor = armors.stream()
-            .filter(a -> a.getName().equalsIgnoreCase(armorName))
-            .findFirst()
-            .orElse(null);
-
-        if (chosenArmor != null) {
-            if (knight.hasArmorType(chosenArmor.getType())) {
-                System.out.println("The knight is already equipped with a " + chosenArmor.getType());
-            } else {
-                knight.equipArmor(chosenArmor);
-                System.out.println(chosenArmor.getName() + " equipped on the knight.");
-
-                armors.remove(chosenArmor);
-
-                try (PrintWriter writer = new PrintWriter("data/armors.txt")) {
-                    for (Armor armor : armors) {
-                        writer.println(armor.getName() + "," + armor.getType() + "," + armor.getWeight() + "," +
-                                    (int)armor.getPrice() + "," + armor.getProtectionLevel() + "," + armor.getMaterial());
+        T chosenItem = items.stream()
+                .filter(i -> {
+                    try {
+                        return i.getClass().getMethod("getName").invoke(i)
+                                .toString().equalsIgnoreCase(name);
+                    } catch (Exception e) {
+                        return false;
                     }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                })
+                .findFirst()
+                .orElse(null);
+
+        if (chosenItem != null) {
+            if (!condition.test(chosenItem)) {
+                System.out.println("Cannot equip this item (condition failed).");
+                return;
             }
-        } else {
-            System.out.println("Armor with name '" + armorName + "' not found.");
-        }
-    }
 
-    private void equipKnightWithWeapon(Scanner scanner) {
-        FileHandler fileHandler = new FileHandler("data/weapons.txt");
-        List<Weapon> weapons = fileHandler.loadWeapons();
-    
-        System.out.println("\n================ Available Weapons ================");
-        weapons.forEach(System.out::println);
-    
-        System.out.print("Enter the name of the weapon you want to equip: ");
-        scanner.nextLine(); 
-        String weaponName = scanner.nextLine();
-    
-        Weapon chosenWeapon = weapons.stream()
-            .filter(a -> a.getName().equalsIgnoreCase(weaponName))
-            .findFirst()
-            .orElse(null);
+            equipAction.accept(chosenItem);
+            System.out.println(name + " equipped on the knight.");
 
-        if(knight.countWeapons()==knight.getMaxWeapons()){
-            System.out.println("The Knight already has maximum weapons");
-        }
-        else{
-            if (chosenWeapon != null) {
-                knight.equipWeapon(chosenWeapon);
-                System.out.println(chosenWeapon.getName() + " equipped on the knight.");
+            items.remove(chosenItem);
 
-                weapons.remove(chosenWeapon);
-
-                try (PrintWriter writer = new PrintWriter("data/weapons.txt")) {
-                    for (Weapon weapon : weapons) {
-                        writer.println(weapon.getName() + "," + weapon.getType() + "," + weapon.getWeight() + "," +
-                                    (int)weapon.getPrice() + "," + weapon.getDamage() + "," + weapon.getMaterial());
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            } else {
-                System.out.println("Weapon with name '" + weaponName + "' not found.");
-            }
-        }
-    }
-
-    private void equipKnightWithAccessory(Scanner scanner) {
-        FileHandler fileHandler = new FileHandler("data/accessories.txt");
-        List<Accessory> accessories = fileHandler.loadAccessories();
-    
-        System.out.println("\n================ Available Weapons ================");
-        accessories.forEach(System.out::println);
-    
-        System.out.print("Enter the name of the weapon you want to equip: ");
-        scanner.nextLine(); 
-        String accessoryName = scanner.nextLine();
-    
-        Accessory chosenAccessory = accessories.stream()
-            .filter(a -> a.getName().equalsIgnoreCase(accessoryName))
-            .findFirst()
-            .orElse(null);
-    
-        if (chosenAccessory != null) {
-            knight.equipAccessory(chosenAccessory);
-            System.out.println(chosenAccessory.getName() + " equipped on the knight.");
-
-            accessories.remove(chosenAccessory);
-
-            try (PrintWriter writer = new PrintWriter("data/accessories.txt")) {
-                for (Accessory accessory : accessories) {
-                    writer.println(accessory.getName() + "," + accessory.getType() + "," + accessory.getWeight() + "," +
-                                (int)accessory.getPrice() + "," + accessory.getEffect());
+            try (PrintWriter writer = new PrintWriter(filePath)) {
+                for (T item : items) {
+                    writerAction.accept(writer, item);
                 }
             } catch (IOException e) {
                 e.printStackTrace();
             }
+
         } else {
-            System.out.println("Accessory with name '" + accessoryName + "' not found.");
+            System.out.println("Item with name '" + name + "' not found.");
         }
     }
 
@@ -326,143 +307,83 @@ public class Menu {
         int subChoice = scanner.nextInt();
         switch (subChoice) {
             case 1:
-                disarmKnightArmor(scanner);
-                break;
+                disarmKnightItem(scanner,
+                    knight::getArmors,
+                    armor -> knight.equipmentCheck(),
+                    "data/armors.txt",
+                    (writer, item) -> {
+                        Armor a = (Armor) item;
+                        writer.println(a.getName() + "," + a.getType() + "," + a.getWeight() + "," +
+                                (int) a.getPrice() + "," + a.getProtectionLevel() + "," + a.getMaterial());
+                    },
+                    "Armor");
+            break;
             case 2:
-                disarmKnightWeapon(scanner);
+                disarmKnightItem(scanner,
+                    knight::getWeapons,
+                    weapon -> knight.equipmentCheck(),
+                    "data/weapons.txt",
+                    (writer, item) -> {
+                        Weapon w = (Weapon) item;
+                        writer.println(w.getName() + "," + w.getType() + "," + w.getWeight() + "," +
+                                (int) w.getPrice() + "," + (int) w.getDamage() + "," + w.getMaterial());
+                    },
+                    "Weapon");
                 break;
             case 3:
-                disarmKnightAccessory(scanner);
+                disarmKnightItem(scanner,
+                    knight::getAccessories,
+                    accessory -> knight.equipmentCheck(),
+                    "data/accessories.txt",
+                    (writer, item) -> {
+                        Accessory a = (Accessory) item;
+                        writer.println(a.getName() + "," + a.getType() + "," + a.getWeight() + "," +
+                                (int) a.getPrice() + "," + a.getEffect());
+                    },
+                    "Accessory");
                 break;
             default:
                 System.out.println("Wrong choice. Returning to main menu...");
         }
     }
 
-    
-    private void disarmKnightArmor(Scanner scanner) {
-        List<Armor> armors = knight.getArmors();
-    
-        System.out.println("\n================ Armors on the Knight ================");
-        armors.forEach(System.out::println);
-    
-        System.out.print("Enter the name of the armor you want to disarm: ");
-        scanner.nextLine(); 
-        String armorName = scanner.nextLine();
-    
-        Armor chosenArmor = armors.stream()
-            .filter(a -> a.getName().equalsIgnoreCase(armorName))
-            .findFirst()
-            .orElse(null);
-    
-        if (chosenArmor != null) {
-            armors.remove(chosenArmor);  
-            knight.equipmentCheck();     
-            System.out.println(chosenArmor.getName() + " has been disarmed from the knight.");
-    
-            try (FileWriter fw = new FileWriter("data/armors.txt", true);
-                BufferedWriter bw = new BufferedWriter(fw);
-                PrintWriter writer = new PrintWriter(bw)) {
+    private <T extends KnightItem> void disarmKnightItem(
+            Scanner scanner,
+            Supplier<List<T>> knightGetter,
+            Consumer<T> disarmAction,
+            String filePath,
+            BiConsumer<PrintWriter, T> writeToFile,
+            String itemName
+    ) {
+        List<T> items = knightGetter.get();
 
-                writer.println(String.join(",",
-                    chosenArmor.getName(),
-                    chosenArmor.getType(),
-                    String.valueOf(chosenArmor.getWeight()),
-                    String.valueOf((int) chosenArmor.getPrice()),
-                    String.valueOf(chosenArmor.getProtectionLevel()),
-                    chosenArmor.getMaterial()
-                ));
+        System.out.println("\n================ " + itemName + " on the Knight ================");
+        items.forEach(System.out::println);
 
+        System.out.print("Enter the name of the " + itemName.toLowerCase() + " you want to disarm: ");
+        scanner.nextLine();
+        String name = scanner.nextLine();
+
+        T chosenItem = items.stream()
+                .filter(i -> i.getName().equalsIgnoreCase(name))
+                .findFirst()
+                .orElse(null);
+
+        if (chosenItem != null) {
+            items.remove(chosenItem);
+            disarmAction.accept(chosenItem);
+            System.out.println(chosenItem.getName() + " has been disarmed from the knight.");
+
+            try (PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter(filePath, true)))) {
+                writeToFile.accept(writer, chosenItem);
             } catch (IOException e) {
                 e.printStackTrace();
             }
         } else {
-            System.out.println("Armor with name '" + armorName + "' not found on the knight.");
-        }            
+            System.out.println(itemName + " with name '" + name + "' not found on the knight.");
+        }
     }
 
-    private void disarmKnightWeapon(Scanner scanner) {
-        List<Weapon> weapons = knight.getWeapons();
-    
-        System.out.println("\n================ Weapons on the Knight ================");
-        weapons.forEach(System.out::println);
-    
-        System.out.print("Enter the name of the weapon you want to disarm: ");
-        scanner.nextLine(); 
-        String weaponName = scanner.nextLine();
-    
-        Weapon chosenWeapon = weapons.stream()
-            .filter(a -> a.getName().equalsIgnoreCase(weaponName))
-            .findFirst()
-            .orElse(null);
-    
-        if (chosenWeapon != null) {
-            weapons.remove(chosenWeapon);  
-            knight.equipmentCheck();     
-            System.out.println(chosenWeapon.getName() + " has been disarmed from the knight.");
-    
-            try (FileWriter fw = new FileWriter("data/armors.txt", true);
-                BufferedWriter bw = new BufferedWriter(fw);
-                PrintWriter writer = new PrintWriter(bw)) {
-
-                writer.println(String.join(",",
-                        chosenWeapon.getName(),
-                        chosenWeapon.getType(),
-                        String.valueOf(chosenWeapon.getWeight()),
-                        String.valueOf((int) chosenWeapon.getPrice()),
-                        String.valueOf((int) chosenWeapon.getDamage()),
-                        chosenWeapon.getMaterial()
-                    ));
-                }
-            catch (IOException e) {
-                e.printStackTrace();
-            }
-        } else {
-            System.out.println("Weapon with name '" + weaponName + "' not found on the knight.");
-        }            
-    }
-    
-    private void disarmKnightAccessory(Scanner scanner) {
-        List<Accessory> accessories = knight.getAccessories();
-    
-        System.out.println("\n================ Accessories on the Knight ================");
-        accessories.forEach(System.out::println);
-    
-        System.out.print("Enter the name of the accessory you want to disarm: ");
-        scanner.nextLine(); 
-        String accessoryName = scanner.nextLine();
-    
-        Accessory chosenAccessory = accessories.stream()
-            .filter(a -> a.getName().equalsIgnoreCase(accessoryName))
-            .findFirst()
-            .orElse(null);
-    
-        if (chosenAccessory != null) {
-            accessories.remove(chosenAccessory);  
-            knight.equipmentCheck();     
-            System.out.println(chosenAccessory.getName() + " has been disarmed from the knight.");
-    
-            try (FileWriter fw = new FileWriter("data/armors.txt", true);
-                BufferedWriter bw = new BufferedWriter(fw);
-                PrintWriter writer = new PrintWriter(bw)) {
-
-                writer.println(String.join(",",
-                        chosenAccessory.getName(),
-                        chosenAccessory.getType(),
-                        String.valueOf(chosenAccessory.getWeight()),
-                        String.valueOf((int) chosenAccessory.getPrice()),
-                        chosenAccessory.getEffect()
-                    ));
-                }
-            catch (IOException e) {
-                e.printStackTrace();
-            }
-    
-        } else {
-            System.out.println("Accessory with name '" + accessoryName + "' not found on the knight.");
-        }            
-    }
-    
 
     //----------------------Calculate Knight`s armor cost------------------------------------------------------------------
     private int calculateCost() {
@@ -474,9 +395,39 @@ public class Menu {
         return cost;
     }
 
+
     //----------------------Sort Items by Weight------------------------------------------------------------------
-    private void sortArmorByWeight(Scanner scanner) { 
-        System.out.println("\n==== Armor Weight Sorting Menu ====");
+    private void sortByWeightMenu(Scanner scanner) {
+        System.out.println("\n==== Sort by Weight Menu ====");
+        System.out.println("1. Armor");
+        System.out.println("2. Weapon");
+        System.out.println("3. Accessory");
+        System.out.print("Choose an option: ");
+    
+        int subChoice = scanner.nextInt();
+        switch (subChoice) {
+            case 1:
+                sortItemsByWeight(scanner, knight::getArmors, FileHandler::loadArmors, "data/armors.txt", "Armor");
+                break;
+            case 2:
+                sortItemsByWeight(scanner, knight::getWeapons, FileHandler::loadWeapons, "data/weapons.txt", "Weapon");
+                break;
+            case 3:
+                sortItemsByWeight(scanner, knight::getAccessories, FileHandler::loadAccessories, "data/accessories.txt", "Accessory");
+                break;
+            default:
+                System.out.println("Wrong choice. Returning to main menu...");
+        }
+    }
+
+    private <T extends KnightItem> void sortItemsByWeight(
+            Scanner scanner,
+            Supplier<List<T>> knightGetter,
+            Function<FileHandler, List<T>> loader,
+            String filePath,
+            String itemName
+    ) {
+        System.out.println("\n==== " + itemName + " Weight Sorting Menu ====");
         System.out.println("1. Inventory");
         System.out.println("2. Knight");
         System.out.print("Choose an option: ");
@@ -484,81 +435,95 @@ public class Menu {
         int subChoice = scanner.nextInt();
         switch (subChoice) {
             case 1:
-                FileHandler fileHandler = new FileHandler("data/armors.txt");
-                List<Armor> armors = fileHandler.loadArmors();
-                List<KnightItem> items = new ArrayList<>(armors);
-                ItemUtils.sortItemsWeight(items);
-                items.forEach(System.out::println);
+                FileHandler fileHandler = new FileHandler(filePath);
+                List<T> items = loader.apply(fileHandler);
+                List<KnightItem> sortList = new ArrayList<>(items);
+                ItemUtils.sortItemsWeight(sortList);
+                sortList.forEach(System.out::println);
                 break;
             case 2:
-                knight.sortArmorsByWeight();
+                List<T> knightItems = knightGetter.get();
+                List<KnightItem> sortKnightList = new ArrayList<>(knightItems);
+                ItemUtils.sortItemsWeight(sortKnightList);
+                sortKnightList.forEach(System.out::println);
                 break;
             default:
                 System.out.println("Wrong choice. Returning to main menu...");
         }
     }
 
-    private void sortWeaponsByWeight(Scanner scanner) { 
-        System.out.println("\n==== Weapon Weight Sorting Menu ====");
-        System.out.println("1. Inventory");
-        System.out.println("2. Knight");
+    
+    //----------------------Find items by price range------------------------------------------------------------------
+    private void findByPriceRangeMenu(Scanner scanner) {
+        System.out.println("\n==== Find by price range Menu ====");
+        System.out.println("1. Armor");
+        System.out.println("2. Weapon");
+        System.out.println("3. Accessory");
         System.out.print("Choose an option: ");
-
+    
         int subChoice = scanner.nextInt();
         switch (subChoice) {
             case 1:
-                FileHandler fileHandler = new FileHandler("data/weapons.txt");
-                List<Weapon> weapons = fileHandler.loadWeapons();
-                List<KnightItem> items = new ArrayList<>(weapons);
-                ItemUtils.sortItemsWeight(items);
-                items.forEach(System.out::println);
+                findItemsByPriceRange(scanner, knight::getArmors, FileHandler::loadArmors, "data/armors.txt", "Armor");
                 break;
             case 2:
-                knight.sortWeaponsByWeight();
+                findItemsByPriceRange(scanner, knight::getWeapons, FileHandler::loadWeapons, "data/weapons.txt", "Weapon");
+                break;
+            case 3:
+                findItemsByPriceRange(scanner, knight::getAccessories, FileHandler::loadAccessories, "data/accessories.txt", "Accessory");
                 break;
             default:
                 System.out.println("Wrong choice. Returning to main menu...");
         }
     }
 
-    private void sortAccessoriesByWeight(Scanner scanner) { 
-        System.out.println("\n==== Accessories Weight Sorting Menu ====");
+    private <T extends KnightItem> void findItemsByPriceRange(
+            Scanner scanner,
+            Supplier<List<T>> knightGetter,
+            Function<FileHandler, List<T>> loader,
+            String filePath,
+            String itemName
+    ) {
+        System.out.println("\n==== " + itemName + " Weight Sorting Menu ====");
         System.out.println("1. Inventory");
         System.out.println("2. Knight");
         System.out.print("Choose an option: ");
-
         int subChoice = scanner.nextInt();
+
+        System.out.println("Enter minimum price: ");
+        int minChoice = scanner.nextInt();
+
+        System.out.println("Enter maximum price: ");
+        int maxChoice = scanner.nextInt();
+
         switch (subChoice) {
             case 1:
-                FileHandler fileHandler = new FileHandler("data/accessories.txt");
-                List<Accessory> accessories = fileHandler.loadAccessories();
-                List<KnightItem> items = new ArrayList<>(accessories);
-                ItemUtils.sortItemsWeight(items);
-                items.forEach(System.out::println);
+                FileHandler fileHandler = new FileHandler(filePath);
+                List<T> items = loader.apply(fileHandler);
+                List<KnightItem> sortList = new ArrayList<>(items);
+                ItemUtils.filterItemsByPrice(sortList, minChoice, maxChoice);
+                sortList.forEach(System.out::println);
                 break;
             case 2:
-                knight.sortAccessoriesByWeight();
+                List<T> knightItems = knightGetter.get();
+                List<KnightItem> sortKnightList = new ArrayList<>(knightItems);
+                ItemUtils.filterItemsByPrice(sortKnightList, minChoice, maxChoice);
+                sortKnightList.forEach(System.out::println);
                 break;
             default:
                 System.out.println("Wrong choice. Returning to main menu...");
         }
     }
-
-    private void findByPriceRange() { System.out.println("Found by price range."); }
 
     private void printMenu() {
         System.out.println("\n=========== Knight menu ============");
-        System.out.println("1. Show all armors");
-        System.out.println("2. Show all weapons");
-        System.out.println("3. Show all accessories");
-        System.out.println("4. Define the hierarchy of the armor");
-        System.out.println("5. Equip the knight");
-        System.out.println("6. Disarm the knight");
-        System.out.println("7. Calculate the cost of the Knight`s armor");
-        System.out.println("8. Sort the armor by weight");
-        System.out.println("9. Sort the weapons by weight");
-        System.out.println("10. Sort the accessories by weight");
-        System.out.println("11. Find armor pieces by price range");
+        System.out.println("1. Show all items");
+        System.out.println("2. Define the hierarchy of the armor");
+        System.out.println("3. Equip the knight");
+        System.out.println("4. Disarm the knight");
+        System.out.println("5. Calculate the cost of the Knight`s armor");
+        System.out.println("6. Sort the items by weight");
+        System.out.println("7. Find armor pieces by price range");
         System.out.println("0. Exit");
         System.out.print("Choose an action: ");
     }
