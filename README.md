@@ -43,4 +43,4 @@ Users can load items from files, equip a knight, view inventory, sort items by w
 ---
 
 ## Features to add
-- Armor hierarchy not only by the type but also according to material
+- Automatic adding of the names of the types/materials to the inventoryArmorHierarchy() and inventoryMaterialHierarchy()
