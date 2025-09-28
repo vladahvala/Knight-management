@@ -2,8 +2,8 @@ Steel Sword,Sword,7.0,100,15,Steel
 Longbow,Bow,4.5,85,12,Wood
 Warhammer,Hammer,10.0,160,22,Iron
 Dagger,Dagger,1.0,25,6,Steel
-Gold Blade,Sword,4.0,700,28, Gold
+Gold Blade,Sword,4.0,700,28,Gold
 Crossbow,Crossbow,6.0,120,18,Steel
 Battleaxe,Axe,9.0,140,20,Iron
 Shortsword,Sword,5.0,60,10,Steel
-Flaming Staff,Staff,3.2,250,8,MysticWood
+Flaming Staff,Staff,3.2,250,8,Wood

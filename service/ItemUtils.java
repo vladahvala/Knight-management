@@ -4,10 +4,12 @@ import java.text.Collator;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import model.Armor;
 import model.KnightItem;
+import model.MaterialItem;
 
 public class ItemUtils {
 
@@ -38,14 +40,22 @@ public class ItemUtils {
     }
 
     public static void inventoryMaterialHierarchy(List<KnightItem> items) {
-        List<String> allTypes = Arrays.asList("Dragonhide", "Steel", "Iron", "Chainmail", "Bronze", "Leather");
-    
-        allTypes.forEach(type -> 
-            items.stream()
-                  .filter(item -> item.getType().equalsIgnoreCase(type))
-                  .forEach(System.out::println)
+        List<String> allMaterials = Arrays.asList(
+            "Dragonhide", "Steel", "Iron", "Chainmail", "Bronze", "Gold", "Leather", "Wood"
         );
+
+        Map<String, List<KnightItem>> grouped = items.stream()
+                .filter(item -> item instanceof MaterialItem)
+                .collect(Collectors.groupingBy(item -> ((MaterialItem) item).getMaterial()));
+
+        for (String material : allMaterials) {
+            List<KnightItem> group = grouped.get(material);
+            if (group != null && !group.isEmpty()) {
+                group.forEach(System.out::println);
+            }
+        }
     }
+
     
     // filtering any inventory item list by price range
     public static List<KnightItem> filterItemsByPrice(List<KnightItem> items, double min, double max) {

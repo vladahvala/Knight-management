@@ -177,7 +177,7 @@ public class Menu {
 
 
     //----------------------Armor Hierarchy by material------------------------------------------------------------------
-    private <T extends KnightItem> void itemHierarchyByMaterialMenuGeneric(
+    private <T extends KnightItem> void itemHierarchyByMaterial(
         Scanner scanner,
         String filePath,
         Function<FileHandler, List<T>> loader,
@@ -189,26 +189,21 @@ public class Menu {
 
         System.out.println("\n=============================== " + itemName + " Hierarchy by Material ===============================");
         ItemUtils.inventoryMaterialHierarchy(itemList);
-        itemList.forEach(System.out::println);
     }
 
     private void itemHierarchyByMaterialMenu(Scanner scanner) {
         System.out.println("\n==== Item Hierarchy by Material Menu ====");
         System.out.println("1. Armor");
         System.out.println("2. Weapon");
-        System.out.println("3. Accessory");
         System.out.print("Choose an option: ");
 
         int subChoice = scanner.nextInt();
         switch (subChoice) {
             case 1:
-                itemHierarchyByMaterialMenuGeneric(scanner, "data/armors.txt", FileHandler::loadArmors, "Armor");
+                itemHierarchyByMaterial(scanner, "data/armors.txt", FileHandler::loadArmors, "Armor");
                 break;
             case 2:
-                itemHierarchyByMaterialMenuGeneric(scanner, "data/weapons.txt", FileHandler::loadWeapons, "Weapon");
-                break;
-            case 3:
-                itemHierarchyByMaterialMenuGeneric(scanner, "data/accessories.txt", FileHandler::loadAccessories, "Accessory");
+                itemHierarchyByMaterial(scanner, "data/weapons.txt", FileHandler::loadWeapons, "Weapon");
                 break;
             default:
                 System.out.println("Wrong choice. Returning to main menu...");
