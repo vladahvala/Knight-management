@@ -43,4 +43,9 @@ Users can load items from files, equip a knight, view inventory, sort items by w
 ---
 
 ## Features to add
-- Automatic adding of the names of the types/materials to the inventoryArmorHierarchy() and inventoryMaterialHierarchy()
+**Functionalities** 
+- The shop with items. The Knight can purchase, sell and trade items;
+- Enemies the Knight can fight and defeat;
+  
+**Code enhancement**
+- Automatic adding of the names of the types/materials to the inventoryArmorHierarchy() and inventoryMaterialHierarchy();
