@@ -36,9 +36,14 @@ public class Armor extends KnightItem implements MaterialItem{
 
     @Override
     public String toString() {
-        return String.format("%-30s %-14s %-6.1f %-6d %-6d %-10s",
-                getName(), getType(), getWeight(), (int)getPrice(), getProtectionLevel(), getMaterial());
+        return String.format("%-30s %-14s %-9.1f %-9d %-14d %-10s",
+                getName(), getType(), getWeight(), (int) getPrice(), getProtectionLevel(), getMaterial());
     }
-    
 
+    // names of the columns 
+    @Override
+    public String getHeader() {
+        return String.format("%-30s %-14s %-9s %-9s %-14s %-10s",
+                "Name", "Type", "Weight", "Price", "Protection", "Material");
+    }
 }

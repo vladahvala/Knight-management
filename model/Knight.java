@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Function;
+import java.util.function.ToDoubleFunction;
 import java.util.Comparator;
 
 public class Knight {
@@ -151,7 +152,7 @@ public class Knight {
         for (String type : missingArmorTypes()) {
             System.out.println(type + "\n");
         }
-        if(weapons.isEmpty()) System.out.println("weapon");
+        if(weapons.isEmpty()) System.out.println("Weapon");
     }
 
     public boolean hasAllArmorTypes() {
@@ -210,16 +211,5 @@ public class Knight {
     public void sortAccessoriesByWeight(){
         accessories.sort(Comparator.comparingDouble(Accessory::getWeight));
     }
-
-    // returns the list of affordable items
-    public <T extends KnightItem> List<String> affordableItems(List<T> items, Function<T, Double> priceGetter) {
-        List<String> affordable = new ArrayList<>();
-        for (T item : items) {
-            if (priceGetter.apply(item) <= getCoins()) {
-                affordable.add(item.getName());
-            }
-        }
-        return affordable;
-    }    
-    
 }
+

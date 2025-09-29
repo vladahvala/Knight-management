@@ -15,12 +15,12 @@ public class ItemUtils {
 
     // sorting any inventory item list by weight
     public static void sortItemsWeight(List<KnightItem> items) {
-        items.sort(Comparator.comparingDouble(KnightItem::getWeight));
+        items.sort(Comparator.comparingDouble(KnightItem::getWeight).reversed());
     }
 
     // sorting any inventory item list by price
     public static void sortItemsPrice(List<KnightItem> items) {
-        items.sort(Comparator.comparingDouble(KnightItem::getPrice));
+        items.sort(Comparator.comparingDouble(KnightItem::getPrice).reversed());
     }
 
     // sorting any inventory item list by type (alphabetical order)

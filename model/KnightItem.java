@@ -15,6 +15,7 @@ public abstract class KnightItem {
 
     // abstract methods
     public abstract void use();
+    public abstract String getHeader();
     
     // Getters/Setters
     public String getName() {
