@@ -148,13 +148,12 @@ public class Knight {
             isFullyEquipped = true;
     }
 
-    public void neededEquipment() {
-        System.out.println("Needed equipment: \n");
-        for (String type : missingArmorTypes()) {
-            System.out.println(type + "\n");
+    public List<String> neededEquipment() {
+        List<String> needed = new ArrayList<>(missingArmorTypes());
+        if (weapons.isEmpty()) {
+            needed.add("Weapon");
         }
-        if (weapons.isEmpty())
-            System.out.println("Weapon");
+        return needed;
     }
 
     public boolean hasAllArmorTypes() {

@@ -1,4 +1,5 @@
 package ui;
+
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -22,7 +23,7 @@ import service.FileHandler;
 
 public class Menu {
     private boolean exit = false;
-    private Knight knight; 
+    private Knight knight;
 
     private void printMenu() {
         System.out.println("\n=========== Knight menu ============");
@@ -85,10 +86,12 @@ public class Menu {
                     findByPriceRangeMenu(scanner);
                     break;
                 case 11:
-                    if(knight.getIsFullyEquipped()) System.out.println("Is fully equipped");
-                    else{
+                    if (knight.getIsFullyEquipped())
+                        System.out.println("Is fully equipped");
+                    else {
                         System.out.println("Is not fully equipped\n");
-                        knight.neededEquipment();
+                        List<String> neededEquip = knight.neededEquipment();
+                        neededEquip.forEach(System.out::println);
                     }
                     break;
                 case 0:
@@ -108,24 +111,25 @@ public class Menu {
 
     // printing the titles of the menus
     private void printHeaderLine(String itemName) {
-        int totalLength = 94; 
+        int totalLength = 94;
         String title = " " + itemName + " ";
         int remaining = totalLength - title.length();
         int left = remaining / 2;
         int right = remaining - left;
-    
+
         String line = "=".repeat(left) + title + "=".repeat(right);
         System.out.println("\n" + line);
     }
 
-    //----------------------Show All Items------------------------------------------------------------------
+    // ----------------------Show All
+    // Items------------------------------------------------------------------
     private void showAllItemsMenu(Scanner scanner) {
         System.out.println("\n======= Show all items Menu =======");
         System.out.println("1. Armor");
         System.out.println("2. Weapon");
         System.out.println("3. Accessory");
         System.out.print("Choose an option: ");
-    
+
         int subChoice = scanner.nextInt();
         switch (subChoice) {
             case 1:
@@ -149,7 +153,7 @@ public class Menu {
                 knight::getArmors,
                 "Armors");
     }
-    
+
     private void showAllWeapons(Scanner scanner) {
         showAllItems(scanner,
                 "data/weapons.txt",
@@ -157,7 +161,7 @@ public class Menu {
                 knight::getWeapons,
                 "Weapons");
     }
-    
+
     private void showAllAccessories(Scanner scanner) {
         showAllItems(scanner,
                 "data/accessories.txt",
@@ -167,12 +171,11 @@ public class Menu {
     }
 
     private <T extends KnightItem> void showAllItems(
-        Scanner scanner,
-        String filePath,
-        Function<FileHandler, List<T>> loader,
-        Supplier<List<T>> knightGetter,
-        String itemName
-    ) {
+            Scanner scanner,
+            String filePath,
+            Function<FileHandler, List<T>> loader,
+            Supplier<List<T>> knightGetter,
+            String itemName) {
         System.out.println("\n======= " + itemName + " Menu =======");
         System.out.println("1. Inventory");
         System.out.println("2. Knight");
@@ -185,7 +188,7 @@ public class Menu {
                 List<T> items = loader.apply(fileHandler);
                 printHeaderLine(itemName + " Inventory");
                 if (!items.isEmpty()) {
-                    System.out.println(items.get(0).getHeader()); 
+                    System.out.println(items.get(0).getHeader());
                 }
                 items.forEach(System.out::println);
                 break;
@@ -193,7 +196,7 @@ public class Menu {
                 List<T> knightItems = knightGetter.get();
                 printHeaderLine(itemName + " Knight");
                 if (!knightItems.isEmpty()) {
-                    System.out.println(knightItems.get(0).getHeader()); 
+                    System.out.println(knightItems.get(0).getHeader());
                 }
                 knightItems.forEach(System.out::println);
                 break;
@@ -202,32 +205,31 @@ public class Menu {
         }
     }
 
-
-    //----------------------Armor Hierarchy by type------------------------------------------------------------------
+    // ----------------------Armor Hierarchy by
+    // type------------------------------------------------------------------
     private void startArmorHierarchyTypeMenu(Scanner scanner) {
         FileHandler fileHandler = new FileHandler("data/armors.txt");
         List<Armor> armors = fileHandler.loadArmors();
         printHeaderLine("Armor Hierarchy by Type (INVENTORY)");
         if (!armors.isEmpty()) {
-            System.out.println(armors.get(0).getHeader()); 
+            System.out.println(armors.get(0).getHeader());
         }
         ItemUtils.inventoryArmorHierarchy(armors);
     }
 
-
-    //----------------------Armor Hierarchy by material------------------------------------------------------------------
+    // ----------------------Armor Hierarchy by
+    // material------------------------------------------------------------------
     private <T extends KnightItem> void itemHierarchyByMaterial(
-        Scanner scanner,
-        String filePath,
-        Function<FileHandler, List<T>> loader,
-        String itemName
-    ) {
+            Scanner scanner,
+            String filePath,
+            Function<FileHandler, List<T>> loader,
+            String itemName) {
         FileHandler fileHandler = new FileHandler(filePath);
         List<T> items = loader.apply(fileHandler);
         List<KnightItem> itemList = new ArrayList<>(items);
         printHeaderLine(itemName + " Hierarchy by Material (INVENTORY)");
         if (!items.isEmpty()) {
-            System.out.println(items.get(0).getHeader()); 
+            System.out.println(items.get(0).getHeader());
         }
         ItemUtils.inventoryMaterialHierarchy(itemList);
     }
@@ -251,15 +253,15 @@ public class Menu {
         }
     }
 
-
-    //----------------------Equip Knight------------------------------------------------------------------
+    // ----------------------Equip
+    // Knight------------------------------------------------------------------
     private void equipKnightMenu(Scanner scanner) {
         System.out.println("\n======= Equip the Knight Menu =======");
         System.out.println("1. Armor");
         System.out.println("2. Weapon");
         System.out.println("3. Accessory");
         System.out.print("Choose an option: ");
-    
+
         int subChoice = scanner.nextInt();
         switch (subChoice) {
             case 1:
@@ -278,7 +280,7 @@ public class Menu {
                         },
                         "Armors");
                 break;
-    
+
             case 2:
                 equipItem(scanner,
                         "data/weapons.txt",
@@ -292,7 +294,7 @@ public class Menu {
                         item -> knight.countWeapons() < knight.getMaxWeapons(),
                         "Weapons");
                 break;
-    
+
             case 3:
                 equipItem(scanner,
                         "data/accessories.txt",
@@ -306,27 +308,26 @@ public class Menu {
                         item -> true,
                         "Accessories");
                 break;
-    
+
             default:
                 System.out.println("Wrong choice. Returning to main menu...");
         }
     }
-    
+
     private <T extends KnightItem> void equipItem(
-        Scanner scanner,
-        String filePath,
-        Function<FileHandler, List<T>> loader,
-        Consumer<T> equipAction,
-        BiConsumer<PrintWriter, T> writerAction,
-        Predicate<T> condition,
-        String itemName
-    ) {
+            Scanner scanner,
+            String filePath,
+            Function<FileHandler, List<T>> loader,
+            Consumer<T> equipAction,
+            BiConsumer<PrintWriter, T> writerAction,
+            Predicate<T> condition,
+            String itemName) {
         FileHandler fileHandler = new FileHandler(filePath);
         List<T> items = loader.apply(fileHandler);
 
         printHeaderLine(itemName + " Available");
         if (!items.isEmpty()) {
-            System.out.println(items.get(0).getHeader()); 
+            System.out.println(items.get(0).getHeader());
         }
         items.forEach(System.out::println);
 
@@ -370,52 +371,52 @@ public class Menu {
         }
     }
 
-
-    //----------------------Disarm Knight------------------------------------------------------------------
+    // ----------------------Disarm
+    // Knight------------------------------------------------------------------
     private void disarmKnightMenu(Scanner scanner) {
         System.out.println("\n======= Disarm the Knight Menu =======");
         System.out.println("1. Armor");
         System.out.println("2. Weapon");
         System.out.println("3. Accessory");
         System.out.print("Choose an option: ");
-    
+
         int subChoice = scanner.nextInt();
         switch (subChoice) {
             case 1:
                 disarmKnightItem(scanner,
-                    knight::getArmors,
-                    armor -> knight.equipmentCheck(),
-                    "data/armors.txt",
-                    (writer, item) -> {
-                        Armor a = (Armor) item;
-                        writer.println(a.getName() + "," + a.getType() + "," + a.getWeight() + "," +
-                                (int) a.getPrice() + "," + a.getProtectionLevel() + "," + a.getMaterial());
-                    },
-                    "Armor");
-            break;
+                        knight::getArmors,
+                        armor -> knight.equipmentCheck(),
+                        "data/armors.txt",
+                        (writer, item) -> {
+                            Armor a = (Armor) item;
+                            writer.println(a.getName() + "," + a.getType() + "," + a.getWeight() + "," +
+                                    (int) a.getPrice() + "," + a.getProtectionLevel() + "," + a.getMaterial());
+                        },
+                        "Armor");
+                break;
             case 2:
                 disarmKnightItem(scanner,
-                    knight::getWeapons,
-                    weapon -> knight.equipmentCheck(),
-                    "data/weapons.txt",
-                    (writer, item) -> {
-                        Weapon w = (Weapon) item;
-                        writer.println(w.getName() + "," + w.getType() + "," + w.getWeight() + "," +
-                                (int) w.getPrice() + "," + (int) w.getDamage() + "," + w.getMaterial());
-                    },
-                    "Weapon");
+                        knight::getWeapons,
+                        weapon -> knight.equipmentCheck(),
+                        "data/weapons.txt",
+                        (writer, item) -> {
+                            Weapon w = (Weapon) item;
+                            writer.println(w.getName() + "," + w.getType() + "," + w.getWeight() + "," +
+                                    (int) w.getPrice() + "," + (int) w.getDamage() + "," + w.getMaterial());
+                        },
+                        "Weapon");
                 break;
             case 3:
                 disarmKnightItem(scanner,
-                    knight::getAccessories,
-                    accessory -> knight.equipmentCheck(),
-                    "data/accessories.txt",
-                    (writer, item) -> {
-                        Accessory a = (Accessory) item;
-                        writer.println(a.getName() + "," + a.getType() + "," + a.getWeight() + "," +
-                                (int) a.getPrice() + "," + a.getEffect());
-                    },
-                    "Accessory");
+                        knight::getAccessories,
+                        accessory -> knight.equipmentCheck(),
+                        "data/accessories.txt",
+                        (writer, item) -> {
+                            Accessory a = (Accessory) item;
+                            writer.println(a.getName() + "," + a.getType() + "," + a.getWeight() + "," +
+                                    (int) a.getPrice() + "," + a.getEffect());
+                        },
+                        "Accessory");
                 break;
             default:
                 System.out.println("Wrong choice. Returning to main menu...");
@@ -428,13 +429,12 @@ public class Menu {
             Consumer<T> disarmAction,
             String filePath,
             BiConsumer<PrintWriter, T> writeToFile,
-            String itemName
-    ) {
+            String itemName) {
         List<T> items = knightGetter.get();
 
         printHeaderLine(itemName + " on the Knight");
         if (!items.isEmpty()) {
-            System.out.println(items.get(0).getHeader()); 
+            System.out.println(items.get(0).getHeader());
         }
         items.forEach(System.out::println);
 
@@ -462,8 +462,8 @@ public class Menu {
         }
     }
 
-
-    //----------------------Calculate Knight`s items cost------------------------------------------------------------------
+    // ----------------------Calculate Knight`s items
+    // cost------------------------------------------------------------------
     private void calcCostMenu(Scanner scanner) {
         System.out.println("\n======= Calculate the cost Menu =======");
         System.out.println("1. Armor");
@@ -492,8 +492,8 @@ public class Menu {
         }
     }
 
-
-    //----------------------Calculate Knight`s items weight------------------------------------------------------------------
+    // ----------------------Calculate Knight`s items
+    // weight------------------------------------------------------------------
     private void calcWeightMenu(Scanner scanner) {
         System.out.println("\n======= Calculate the weight Menu =======");
         System.out.println("1. Armor");
@@ -522,15 +522,15 @@ public class Menu {
         }
     }
 
-
-    //----------------------Sort Items by Weight------------------------------------------------------------------
+    // ----------------------Sort Items by
+    // Weight------------------------------------------------------------------
     private void sortByWeightMenu(Scanner scanner) {
         System.out.println("\n======= Sort by Weight Menu =======");
         System.out.println("1. Armor");
         System.out.println("2. Weapon");
         System.out.println("3. Accessory");
         System.out.print("Choose an option: ");
-    
+
         int subChoice = scanner.nextInt();
         switch (subChoice) {
             case 1:
@@ -540,7 +540,8 @@ public class Menu {
                 sortItemsByWeight(scanner, knight::getWeapons, FileHandler::loadWeapons, "data/weapons.txt", "Weapon");
                 break;
             case 3:
-                sortItemsByWeight(scanner, knight::getAccessories, FileHandler::loadAccessories, "data/accessories.txt", "Accessory");
+                sortItemsByWeight(scanner, knight::getAccessories, FileHandler::loadAccessories, "data/accessories.txt",
+                        "Accessory");
                 break;
             default:
                 System.out.println("Wrong choice. Returning to main menu...");
@@ -552,8 +553,7 @@ public class Menu {
             Supplier<List<T>> knightGetter,
             Function<FileHandler, List<T>> loader,
             String filePath,
-            String itemName
-    ) {
+            String itemName) {
         System.out.println("\n======= " + itemName + " Weight Sorting Menu =======");
         System.out.println("1. Inventory");
         System.out.println("2. Knight");
@@ -568,7 +568,7 @@ public class Menu {
                 ItemUtils.sortItemsWeight(sortList);
                 printHeaderLine(itemName + " sorted by Weight");
                 if (!items.isEmpty()) {
-                    System.out.println(items.get(0).getHeader()); 
+                    System.out.println(items.get(0).getHeader());
                 }
                 sortList.forEach(System.out::println);
                 break;
@@ -578,7 +578,7 @@ public class Menu {
                 ItemUtils.sortItemsWeight(sortKnightList);
                 printHeaderLine(itemName + " sorted by Weight");
                 if (!sortKnightList.isEmpty()) {
-                    System.out.println(sortKnightList.get(0).getHeader()); 
+                    System.out.println(sortKnightList.get(0).getHeader());
                 }
                 sortKnightList.forEach(System.out::println);
                 break;
@@ -587,15 +587,15 @@ public class Menu {
         }
     }
 
-
-    //----------------------Sort Items by Weight------------------------------------------------------------------
+    // ----------------------Sort Items by
+    // Weight------------------------------------------------------------------
     private void sortByPriceMenu(Scanner scanner) {
         System.out.println("\n======= Sort by Price Menu =======");
         System.out.println("1. Armor");
         System.out.println("2. Weapon");
         System.out.println("3. Accessory");
         System.out.print("Choose an option: ");
-    
+
         int subChoice = scanner.nextInt();
         switch (subChoice) {
             case 1:
@@ -605,7 +605,8 @@ public class Menu {
                 sortItemsByPrice(scanner, knight::getWeapons, FileHandler::loadWeapons, "data/weapons.txt", "Weapon");
                 break;
             case 3:
-                sortItemsByPrice(scanner, knight::getAccessories, FileHandler::loadAccessories, "data/accessories.txt", "Accessory");
+                sortItemsByPrice(scanner, knight::getAccessories, FileHandler::loadAccessories, "data/accessories.txt",
+                        "Accessory");
                 break;
             default:
                 System.out.println("Wrong choice. Returning to main menu...");
@@ -617,8 +618,7 @@ public class Menu {
             Supplier<List<T>> knightGetter,
             Function<FileHandler, List<T>> loader,
             String filePath,
-            String itemName
-    ) {
+            String itemName) {
         System.out.println("\n======= " + itemName + " Price Sorting Menu =======");
         System.out.println("1. Inventory");
         System.out.println("2. Knight");
@@ -633,7 +633,7 @@ public class Menu {
                 ItemUtils.sortItemsPrice(sortList);
                 printHeaderLine(itemName + " sorted by Weight");
                 if (!items.isEmpty()) {
-                    System.out.println(items.get(0).getHeader()); 
+                    System.out.println(items.get(0).getHeader());
                 }
                 sortList.forEach(System.out::println);
                 break;
@@ -643,7 +643,7 @@ public class Menu {
                 ItemUtils.sortItemsPrice(sortKnightList);
                 printHeaderLine(itemName + " sorted by Weight");
                 if (!sortKnightList.isEmpty()) {
-                    System.out.println(sortKnightList.get(0).getHeader()); 
+                    System.out.println(sortKnightList.get(0).getHeader());
                 }
                 sortKnightList.forEach(System.out::println);
                 break;
@@ -652,25 +652,27 @@ public class Menu {
         }
     }
 
-
-    //----------------------Find items by price range------------------------------------------------------------------
+    // ----------------------Find items by price
+    // range------------------------------------------------------------------
     private void findByPriceRangeMenu(Scanner scanner) {
         System.out.println("\n======= Find by price range Menu =======");
         System.out.println("1. Armor");
         System.out.println("2. Weapon");
         System.out.println("3. Accessory");
         System.out.print("Choose an option: ");
-    
+
         int subChoice = scanner.nextInt();
         switch (subChoice) {
             case 1:
                 findItemsByPriceRange(scanner, knight::getArmors, FileHandler::loadArmors, "data/armors.txt", "Armor");
                 break;
             case 2:
-                findItemsByPriceRange(scanner, knight::getWeapons, FileHandler::loadWeapons, "data/weapons.txt", "Weapon");
+                findItemsByPriceRange(scanner, knight::getWeapons, FileHandler::loadWeapons, "data/weapons.txt",
+                        "Weapon");
                 break;
             case 3:
-                findItemsByPriceRange(scanner, knight::getAccessories, FileHandler::loadAccessories, "data/accessories.txt", "Accessory");
+                findItemsByPriceRange(scanner, knight::getAccessories, FileHandler::loadAccessories,
+                        "data/accessories.txt", "Accessory");
                 break;
             default:
                 System.out.println("Wrong choice. Returning to main menu...");
@@ -678,12 +680,11 @@ public class Menu {
     }
 
     private <T extends KnightItem> void findItemsByPriceRange(
-        Scanner scanner,
-        Supplier<List<T>> knightGetter,
-        Function<FileHandler, List<T>> loader,
-        String filePath,
-        String itemName
-    ) {
+            Scanner scanner,
+            Supplier<List<T>> knightGetter,
+            Function<FileHandler, List<T>> loader,
+            String filePath,
+            String itemName) {
         System.out.println("\n======= " + itemName + " Price Range Menu =======");
         System.out.println("1. Inventory");
         System.out.println("2. Knight");
