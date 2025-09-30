@@ -214,7 +214,8 @@ public class Menu {
         if (!armors.isEmpty()) {
             System.out.println(armors.get(0).getHeader());
         }
-        ItemUtils.inventoryArmorHierarchy(armors);
+        List<Armor> inventArmorHier = ItemUtils.getArmorHierarchy(armors);
+        inventArmorHier.forEach(System.out::println);
     }
 
     // ----------------------Armor Hierarchy by
@@ -231,7 +232,8 @@ public class Menu {
         if (!items.isEmpty()) {
             System.out.println(items.get(0).getHeader());
         }
-        ItemUtils.inventoryMaterialHierarchy(itemList);
+        List<KnightItem> sortedItems = ItemUtils.getMaterialHierarchy(itemList);
+        sortedItems.forEach(System.out::println);
     }
 
     private void itemHierarchyByMaterialMenu(Scanner scanner) {
