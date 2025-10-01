@@ -28,7 +28,14 @@ Users can load items from files, equip a knight, view inventory, sort items by w
   - inheritance (`Armor`, `Weapon`, `Accessory` extend `KnightItem`);
   - encapsulation;
   - polymorphism.
-
+- 🧪 **JUnit tests for classes**:
+  - `Knight` 
+  - `Armor`
+  - `Weapon`
+  - `Accessory`
+  - `ItemUtils`
+  - `FileHandler`
+    
 ---
 
 ## Project Structure
@@ -49,3 +56,4 @@ Users can load items from files, equip a knight, view inventory, sort items by w
   
 **Code enhancement**
 - Automatic adding of the names of the types/materials to the inventoryArmorHierarchy() and inventoryMaterialHierarchy();
+- case insensitivity
